@@ -1,0 +1,21 @@
+# Robots.txt for КиноГорыныч
+# https://kinogorynich.ru
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://kinogorynich.ru/sitemap.xml
+
+# Yandex specific
+User-agent: Yandex
+Allow: /
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+
+# Disallow admin and private paths (if any)
+Disallow: /api/
+Disallow: /*.json$

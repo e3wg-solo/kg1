@@ -1,0 +1,26 @@
+{
+  "name": "КиноГорыныч — Видеопродакшн",
+  "short_name": "КиноГорыныч",
+  "description": "КиноГорыныч — эксперт в создании визуального контента любого уровня сложности. Огонь в каждом кадре.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/gor.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/gor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "ru",
+  "categories": ["business", "entertainment", "productivity"]
+}
