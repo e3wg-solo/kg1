@@ -55,7 +55,7 @@ const GlobalStyles = () => (
 /* --- Custom Components & Styles --- */
 
 const FireGlow = ({ className = "" }) => (
-  <div className={`absolute -inset-0.5 bg-gradient-to-r from-red-600 to-yellow-500 rounded-3xl blur opacity-30 group-hover:opacity-100 transition duration-500 ${className}`}></div>
+  <div className={`absolute -inset-0.5 bg-gradient-to-r from-white/20 to-gray-400/20 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500 ${className}`}></div>
 );
 
 const BentoCard = ({ children, className = "", title, subtitle, colSpan = "col-span-1" }) => (
@@ -69,7 +69,7 @@ const BentoCard = ({ children, className = "", title, subtitle, colSpan = "col-s
 
 const SectionTitle = ({ children, subtitle }) => (
   <div className="mb-12 md:mb-20 px-4">
-    {subtitle && <span className="text-red-500 font-bold tracking-widest uppercase text-sm mb-2 block animate-pulse">КиноГорыныч</span>}
+    {subtitle && <span className="text-gray-400 font-bold tracking-widest uppercase text-sm mb-2 block">КиноГорыныч</span>}
     <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
       {children}
     </h2>
@@ -78,8 +78,8 @@ const SectionTitle = ({ children, subtitle }) => (
 
 const PrimaryButton = ({ text, onClick, href, className = "" }) => (
   <button onClick={onClick} className={`relative inline-flex group ${className}`}>
-    <div className="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#FF4D4D] via-[#F9CB28] to-[#FF4D4D] rounded-full blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
-    <a href={href} title={text} className="relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-neutral-900 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border border-neutral-700 group-hover:bg-neutral-800 w-full md:w-auto">
+    <div className="absolute transition-all duration-1000 opacity-50 -inset-px bg-gradient-to-r from-white/30 via-gray-400/30 to-white/30 rounded-full blur-lg group-hover:opacity-80 group-hover:-inset-1 group-hover:duration-200"></div>
+    <a href={href} title={text} className="relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-neutral-900 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border border-neutral-500 group-hover:bg-neutral-800 w-full md:w-auto">
       {text}
       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
     </a>
@@ -88,8 +88,8 @@ const PrimaryButton = ({ text, onClick, href, className = "" }) => (
 
 const SecondaryButton = ({ text, onClick, href, className = "" }) => (
   <button onClick={onClick} className={`relative inline-flex group ${className}`}>
-    <div className="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#F97316] via-[#F97316] to-[#F97316] rounded-full blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
-    <a href={href} title={text} className="relative inline-flex items-center justify-center px-4 py-2.5 md:px-8 md:py-4 text-base md:text-lg font-bold text-white transition-all duration-200 bg-neutral-900 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 border border-orange-500/50 group-hover:bg-neutral-800 w-full md:w-auto">
+    <div className="absolute transition-all duration-1000 opacity-50 -inset-px bg-gradient-to-r from-gray-400/30 via-gray-400/30 to-gray-400/30 rounded-full blur-lg group-hover:opacity-80 group-hover:-inset-1 group-hover:duration-200"></div>
+    <a href={href} title={text} className="relative inline-flex items-center justify-center px-4 py-2.5 md:px-8 md:py-4 text-base md:text-lg font-bold text-white transition-all duration-200 bg-neutral-900 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 border border-gray-500/50 group-hover:bg-neutral-800 w-full md:w-auto">
       {text}
       <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
     </a>
@@ -221,13 +221,17 @@ const SparkCanvas = () => {
     const particles = [];
     const particleCount = 80; // Уменьшено для производительности
 
-    // Pre-calculated colors для избежания Math.random() в draw loop
-    const preCalcColors = Array.from({ length: 20 }, () => ({
-      g1: Math.floor(Math.random() * 80 + 150),
-      b1: Math.floor(Math.random() * 50),
-      g2: Math.floor(Math.random() * 80 + 100),
-      b2: Math.floor(Math.random() * 30)
-    }));
+    // Pre-calculated colors для избежания Math.random() в draw loop (чёрно-белые тона)
+    const preCalcColors = Array.from({ length: 20 }, () => {
+      const gray1 = Math.floor(Math.random() * 80 + 170);
+      const gray2 = Math.floor(Math.random() * 60 + 140);
+      return {
+        g1: gray1,
+        b1: gray1,
+        g2: gray2,
+        b2: gray2
+      };
+    });
 
     class Particle {
       constructor() {
@@ -260,11 +264,11 @@ const SparkCanvas = () => {
         ctx.save();
      
         ctx.shadowBlur = this.size * 3;
-        ctx.shadowColor = `rgba(255, ${colors.g1}, ${colors.b1}, ${this.opacity * 0.8})`;
+        ctx.shadowColor = `rgba(${colors.g1}, ${colors.g1}, ${colors.g1}, ${this.opacity * 0.6})`;
         
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, ${colors.g2}, ${colors.b2}, ${this.opacity})`;
+        ctx.fillStyle = `rgba(${colors.g2}, ${colors.g2}, ${colors.g2}, ${this.opacity})`;
         ctx.fill();
         
         ctx.restore();
@@ -373,7 +377,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
               >
                 <FireGlow className="opacity-0 group-hover:opacity-30" />
                 <div className="relative bg-neutral-900 rounded-3xl p-6 lg:p-8 border border-neutral-800 flex flex-col min-h-[350px] h-full">
-                  <div className="text-red-500 text-4xl lg:text-5xl font-serif leading-none mb-3 lg:mb-4">"</div>
+                  <div className="text-gray-400 text-4xl lg:text-5xl font-serif leading-none mb-3 lg:mb-4">"</div>
                   <p className="text-gray-300 leading-relaxed mb-6 flex-grow text-sm lg:text-base">
                     {testimonial.text}
                   </p>
@@ -390,7 +394,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
                     </div>
                     <div>
                       <p className="text-white font-bold text-base lg:text-lg">{testimonial.name}</p>
-                      <p className="text-red-500 text-sm font-medium">{testimonial.role}</p>
+                      <p className="text-gray-400 text-sm font-medium">{testimonial.role}</p>
                       <p className="text-gray-500 text-xs lg:text-sm">{testimonial.company}</p>
                     </div>
                   </div>
@@ -407,7 +411,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
           <motion.button 
             onClick={scrollPrev}
             disabled={!canScrollPrev}
-            className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             whileHover={{ scale: canScrollPrev ? 1.1 : 1 }}
             whileTap={{ scale: canScrollPrev ? 0.95 : 1 }}
           >
@@ -421,7 +425,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
                 onClick={() => scrollTo(idx)}
                 className={`h-2 rounded-full transition-colors ${
                   idx === selectedIndex 
-                    ? 'bg-red-500' 
+                    ? 'bg-white' 
                     : 'bg-neutral-600 hover:bg-neutral-500'
                 }`}
                 animate={{ width: idx === selectedIndex ? 24 : 8 }}
@@ -434,7 +438,7 @@ const TestimonialsCarousel = ({ testimonials }) => {
           <motion.button 
             onClick={scrollNext}
             disabled={!canScrollNext}
-            className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             whileHover={{ scale: canScrollNext ? 1.1 : 1 }}
             whileTap={{ scale: canScrollNext ? 0.95 : 1 }}
           >
@@ -581,13 +585,13 @@ const ServiceVideoCarousel = ({ videos, serviceTitle }) => {
       {/* Навигационные кнопки */}
       <button 
         onClick={scrollPrev}
-        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-white hover:text-black rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
       >
         <ChevronLeft size={20} />
       </button>
       <button 
         onClick={scrollNext}
-        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-white hover:text-black rounded-full flex items-center justify-center transition-colors backdrop-blur-sm"
       >
         <ChevronRight size={20} />
       </button>
@@ -601,7 +605,7 @@ const ServiceVideoCarousel = ({ videos, serviceTitle }) => {
               className="flex-[0_0_480px] min-w-0"
             >
               <div 
-                className="embla__slide__content h-[330px] bg-neutral-800 rounded-xl relative overflow-hidden group/slide cursor-grab active:cursor-grabbing border border-neutral-700 hover:border-red-500/50"
+                className="embla__slide__content h-[330px] bg-neutral-800 rounded-xl relative overflow-hidden group/slide cursor-grab active:cursor-grabbing border border-neutral-700 hover:border-white/50"
                 style={{ 
                   opacity: 1, 
                   transform: 'scale(1)',
@@ -623,8 +627,8 @@ const ServiceVideoCarousel = ({ videos, serviceTitle }) => {
                   // Плейсхолдер если ID не заполнен
                   <>
                     <div className="w-full h-full bg-gradient-to-br from-neutral-800 via-neutral-850 to-neutral-900 flex flex-col items-center justify-center">
-                      <div className="w-24 h-24 rounded-full bg-neutral-700/50 flex items-center justify-center mb-4 group-hover/slide:bg-red-600/30 transition-colors">
-                        <Play className="text-neutral-500 w-12 h-12 group-hover/slide:text-red-400 transition-colors" />
+                      <div className="w-24 h-24 rounded-full bg-neutral-700/50 flex items-center justify-center mb-4 group-hover/slide:bg-white/20 transition-colors">
+                        <Play className="text-neutral-500 w-12 h-12 group-hover/slide:text-white transition-colors" />
                       </div>
                       <span className="text-neutral-400 text-base font-medium">{video.title}</span>
                       <span className="text-neutral-600 text-sm mt-2"></span>
@@ -646,7 +650,7 @@ const ServiceVideoCarousel = ({ videos, serviceTitle }) => {
             onClick={() => emblaApi?.scrollTo(idx)}
             className={`h-2 rounded-full transition-all duration-300 ${
               idx === selectedIndex 
-                ? 'bg-red-500 w-6' 
+                ? 'bg-white w-6' 
                 : 'bg-white/30 hover:bg-white/50 w-2'
             }`}
           />
@@ -688,12 +692,12 @@ const TeamCarousel = ({ teamData, setActiveTeamMember }) => {
             whileHover={{ y: -10, transition: { duration: 0.3 } }}
           >
             {/* Градиент с правильным радиусом: rounded-2xl (16px) + inset (2px) = 18px */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-yellow-500 rounded-[18px] blur-md opacity-0 group-hover:opacity-30 transition duration-500 pointer-events-none"></div>
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-white/20 to-gray-400/20 rounded-[18px] blur-md opacity-0 group-hover:opacity-40 transition duration-500 pointer-events-none"></div>
             <div className="relative overflow-hidden rounded-2xl bg-neutral-900 aspect-[3/4]">
               <img src={member.img} alt={member.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent flex flex-col justify-end p-6">
                 <h4 className="text-xl font-bold text-white">{member.name}</h4>
-                <p className="text-sm text-red-500">{member.role}</p>
+                <p className="text-sm text-gray-400">{member.role}</p>
                 <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 text-xs text-gray-300">
                   Нажмите, чтобы узнать больше
                 </div>
@@ -717,12 +721,12 @@ const TeamCarousel = ({ teamData, setActiveTeamMember }) => {
                 whileTap={{ scale: 0.98 }}
               >
                 {/* Градиент с правильным радиусом: rounded-2xl (16px) + inset (2px) = 18px */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-yellow-500 rounded-[18px] blur-md opacity-0 group-hover:opacity-30 transition duration-500 pointer-events-none"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-white/20 to-gray-400/20 rounded-[18px] blur-md opacity-0 group-hover:opacity-40 transition duration-500 pointer-events-none"></div>
                 <div className="relative overflow-hidden rounded-2xl bg-neutral-900 aspect-[3/4]">
                   <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent flex flex-col justify-end p-6">
                     <h4 className="text-xl font-bold text-white">{member.name}</h4>
-                    <p className="text-sm text-red-500">{member.role}</p>
+                    <p className="text-sm text-gray-400">{member.role}</p>
                     <div className="mt-4 text-xs text-gray-300">
                       Нажмите, чтобы узнать больше
                     </div>
@@ -749,7 +753,7 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTeamMember, setActiveTeamMember] = useState(null);
-  const auroraColorStops = useMemo(() => ["#e25e32", "#cf0202", "#ff7300"], []);
+  const auroraColorStops = useMemo(() => ["#ffffff", "#888888", "#cccccc"], []);
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [name, setName] = useState('');
@@ -780,6 +784,7 @@ export default function App() {
     notes: ''
   });
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isShowreelOpen, setIsShowreelOpen] = useState(false);
   
   // Видео примеры Plates с Rutube (замените на реальные ID видео)
   const plateVideos = [
@@ -1121,7 +1126,7 @@ ${projectDescription}
     },
     { 
       title: "Рекламные Ролики", 
-      desc: "Продающие истории с киношной картинкой.", 
+      desc: "Продающие истории с профессиональной картинкой.", 
       quote: "В нашем мире внимание — главный ресурс! Мы снимаем контент, который цепляет.", 
       author: "КиноГорыныч",
       videos: [
@@ -1191,12 +1196,12 @@ ${projectDescription}
   ];
 
   return (
-    <div className="bg-[#050505] min-h-screen text-gray-200 font-sans selection:bg-red-900 selection:text-white overflow-x-hidden">
+    <div className="bg-[#050505] min-h-screen text-gray-200 font-sans selection:bg-neutral-700 selection:text-white overflow-x-hidden">
       <GlobalStyles />
       
       {/* --- Sticky Header --- */}
       <motion.nav 
-        className={`fixed top-4 left-1/2 transform -translate-x-1/2 w-[95%] md:w-[90%] z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-neutral-900/80 backdrop-blur-md shadow-lg shadow-red-900/10' : 'bg-transparent'} rounded-full px-6 py-4 border border-white/5`}
+        className={`fixed top-4 left-1/2 transform -translate-x-1/2 w-[95%] md:w-[90%] z-50 transition-all duration-300 ${scrollY > 50 ? 'bg-neutral-900/80 backdrop-blur-md shadow-lg shadow-black/30' : 'bg-transparent'} rounded-full px-6 py-4 border border-white/5`}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
@@ -1210,8 +1215,7 @@ ${projectDescription}
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            <img src="/gorh.png" alt="КиноГорыныч" className="w-8 h-8 object-contain" />
-            <span className="text-xl font-bold text-white tracking-wider">КИНО<span className="text-red-500">ГОРЫНЫЧ</span></span>
+            <img src="/gorh1.png" alt="КиноГорыныч" className="h-8 w-auto object-contain" />
           </a>
           
           <div className="hidden md:flex gap-8 text-sm font-medium text-gray-300">
@@ -1224,7 +1228,7 @@ ${projectDescription}
               <motion.a 
                 key={link.href}
                 href={`#${link.href}`} 
-                className="hover:text-red-500 transition-colors"
+                className="hover:text-white transition-colors"
                 whileHover={{ y: -2 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1277,7 +1281,7 @@ ${projectDescription}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ scale: 1.1, color: '#ef4444' }}
+                whileHover={{ scale: 1.1, color: '#ffffff' }}
               >
                 {link.label}
               </motion.a>
@@ -1311,7 +1315,7 @@ ${projectDescription}
             transition={{ delay: 0.15, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             КИНО<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500">ГОРЫНЫЧ</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-400">ГОРЫНЫЧ</span>
           </motion.h1>
           <motion.p 
             className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed"
@@ -1320,14 +1324,21 @@ ${projectDescription}
             transition={{ delay: 0.35, duration: 0.4 }}
           >
             Эксперт в создании визуального контента любого уровня сложности. <br/>
-            <span className="text-red-400">Огонь в каждом кадре.</span>
+            <span className="text-gray-400">Огонь в каждом кадре.</span>
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55, duration: 0.4 }}
           >
-            <PrimaryButton text="Смотреть Шоурил" href="https://rutube.ru/video/9124225796b65d2adfc0ab186798b1d2/?r=wd" />
+            <PrimaryButton
+              text="Смотреть Шоурил"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsShowreelOpen(true);
+              }}
+            />
           </motion.div>
         </motion.div>
       </header>
@@ -1344,7 +1355,7 @@ ${projectDescription}
           <motion.div variants={staggerItem} className="col-span-1 md:col-span-2">
             <BentoCard colSpan="" className="min-h-[300px] h-full">
               <div>
-                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mb-6">
+                <div className="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center mb-6">
                   <Film className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">20 лет на площадке</h3>
@@ -1357,7 +1368,7 @@ ${projectDescription}
           <motion.div variants={staggerItem} className="col-span-1 md:col-span-2">
             <BentoCard colSpan="" className="h-full">
               <div>
-                <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center mb-6">
+                <div className="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center mb-6">
                   <Camera className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">4K HDR и Спецтехника</h3>
@@ -1368,7 +1379,7 @@ ${projectDescription}
 
           <motion.div variants={staggerItem}>
             <BentoCard className="bg-gradient-to-br from-neutral-900 to-neutral-800 h-full">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center mb-6">
                 <Zap className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">VR & Virtual Prod</h3>
@@ -1378,7 +1389,7 @@ ${projectDescription}
 
           <motion.div variants={staggerItem}>
             <BentoCard className="h-full">
-              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center mb-6">
                 <Users className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Гибкий бюджет</h3>
@@ -1413,11 +1424,11 @@ ${projectDescription}
                     <motion.div 
                       key={idx} 
                       variants={staggerItem}
-                      className="p-8 border border-neutral-800 rounded-2xl hover:border-red-500/50 transition-colors group"
+                      className="p-8 border border-neutral-800 rounded-2xl hover:border-white/50 transition-colors group"
                       whileHover={{ y: -5, transition: { duration: 0.2 } }}
                     >
-                        <div className="text-red-500 mb-4 font-mono">0{idx + 1}</div>
-                        <h4 className="text-xl font-bold text-white mb-3 group-hover:text-red-400 transition-colors">{item.title}</h4>
+                        <div className="text-gray-500 mb-4 font-mono">0{idx + 1}</div>
+                        <h4 className="text-xl font-bold text-white mb-3 group-hover:text-gray-300 transition-colors">{item.title}</h4>
                         <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
                     </motion.div>
                 ))}
@@ -1432,7 +1443,7 @@ ${projectDescription}
       {/* --- Services (Horizontal Narrative) --- */}
       <section id="services" className="py-24">
         <ScrollReveal className="max-w-7xl mx-auto px-4 mb-20">
-           <SectionTitle subtitle="Наши услуги">Продакшн <span className="text-red-500">полного цикла</span></SectionTitle>
+           <SectionTitle subtitle="Наши услуги">Продакшн <span className="text-gray-400">полного цикла</span></SectionTitle>
         </ScrollReveal>
 
         <div className="flex flex-col gap-32">
@@ -1448,17 +1459,17 @@ ${projectDescription}
                               viewport={{ once: true }}
                               transition={{ duration: 0.6, delay: 0.2 }}
                             >
-                                <div className="text-red-500 font-mono mb-4 text-sm">УСЛУГА #{index + 1}</div>
+                                <div className="text-gray-500 font-mono mb-4 text-sm">УСЛУГА #{index + 1}</div>
                                 <h3 className="text-4xl font-bold text-white mb-6">{service.title}</h3>
-                                <blockquote className="border-l-2 border-red-500 pl-6 italic text-gray-400 mb-8 text-lg">
+                                <blockquote className="border-l-2 border-gray-500 pl-6 italic text-gray-400 mb-8 text-lg">
                                     "{service.quote}"
-                                    <footer className="text-red-400 text-sm mt-2 not-italic font-bold">— {service.author}</footer>
+                                    <footer className="text-gray-400 text-sm mt-2 not-italic font-bold">— {service.author}</footer>
                                 </blockquote>
                                 <p className="text-gray-300 mb-8">{service.desc}</p>
                                 <p className="text-sm font-bold text-white/50 mb-8 uppercase tracking-widest text-xs">
                                     Мы поднимаем ваш проект до уровня кино
                                 </p>
-                                <a href="#contact" className="text-white border-b border-red-500 pb-1 hover:text-red-500 transition-colors">Обсудить проект &rarr;</a>
+                                <a href="#contact" className="text-white border-b border-gray-500 pb-1 hover:text-gray-400 transition-colors">Обсудить проект &rarr;</a>
                             </motion.div>
 
                             {/* Visual Side (Swipeable Video Carousel) */}
@@ -1484,7 +1495,7 @@ ${projectDescription}
       {/* --- Tech Block: Virtual Production & Solovey --- */}
       <section id="tech" className="py-24 bg-neutral-900 text-white relative overflow-hidden">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-red-900/5 blur-3xl rounded-full pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 blur-3xl rounded-full pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
             <ScrollReveal>
@@ -1494,27 +1505,27 @@ ${projectDescription}
             {/* Tech 1: VR Production */}
             <div className="grid md:grid-cols-2 gap-12 mb-32 items-center">
                 <ScrollReveal variants={fadeInLeft} className="space-y-6">
-                    <h3 className="text-3xl font-bold text-red-500">Виртуальный продакшн & Стабилизация</h3>
+                    <h3 className="text-3xl font-bold text-white">Виртуальный продакшн & Стабилизация</h3>
                     <p className="text-gray-300 leading-relaxed">
                         Мы представляем лучшее решение для съемки фонов под CG или VR. Наш архив кинофонов и уникальные технологии позволяют снимать автомобильные сцены на высшем уровне.
                     </p>
                     <ul className="space-y-4 text-gray-400">
                         <li className="flex items-start gap-3">
-                            <Zap className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                            <Zap className="w-6 h-6 text-gray-400 flex-shrink-0" />
                             <span>Уникальная стабилизация «Горыныч»: синхронизация 9-12 камер, съемка 360°.</span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <Zap className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                            <Zap className="w-6 h-6 text-gray-400 flex-shrink-0" />
                             <span>Риги для любой задачи: машины, поезда, корабли, самолеты.</span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <Zap className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                            <Zap className="w-6 h-6 text-gray-400 flex-shrink-0" />
                             <span>Гибкое ценообразование под ваши задачи.</span>
                         </li>
                     </ul>
                 </ScrollReveal>
                 <ScrollReveal variants={fadeInRight}>
-                  <div className="relative h-[400px] rounded-3xl overflow-hidden border border-red-900/30 group">
+                  <div className="relative h-[400px] rounded-3xl overflow-hidden border border-neutral-700 group">
                       {stabilizationVideoId && stabilizationVideoId.trim() !== '' ? (
                         // Если есть ID видео - показываем iframe Rutube
                         <iframe 
@@ -1549,8 +1560,8 @@ ${projectDescription}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
-                          <div className="inline-block bg-blue-900/30 text-blue-400 px-3 py-1 rounded text-xs uppercase mb-4">Best Startup 2023 Award</div>
-                          <h3 className="text-4xl font-bold mb-6">Рейндифлектор <span className="text-blue-500">"Соловей"</span></h3>
+                          <div className="inline-block bg-neutral-800 text-gray-400 px-3 py-1 rounded text-xs uppercase mb-4">Best Startup 2023 Award</div>
+                          <h3 className="text-4xl font-bold mb-6">Рейндифлектор <span className="text-gray-300">"Соловей"</span></h3>
                           <p className="text-gray-400 mb-6">
                               Проблема: Дождь и снег портят оптику и отменяют съемки.<br/>
                               Решение: Вращающийся фильтр (6000 об/мин) с гидрофобным покрытием, отводящий воду центробежной силой.
@@ -1590,7 +1601,7 @@ ${projectDescription}
                                 <img src="https://placehold.co/800x600/001/333?text=Rain+Deflector" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500" alt="Solovey" />
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <div className="bg-black/70 backdrop-blur-md px-6 py-4 rounded-xl border border-white/10 group-hover:scale-110 transition-transform">
-                                        <span className="text-blue-400 font-mono animate-pulse">1000-6000 RPM</span>
+                                        <span className="text-gray-400 font-mono animate-pulse">1000-6000 RPM</span>
                                     </div>
                                 </div>
                              </div>
@@ -1610,8 +1621,8 @@ ${projectDescription}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
-                          <div className="inline-block bg-orange-900/30 text-orange-400 px-3 py-1 rounded text-xs uppercase mb-4">VR Production</div>
-                          <h3 className="text-3xl lg:text-4xl font-bold mb-6">Plates для <span className="text-orange-400">виртуального продакшена</span></h3>
+                          <div className="inline-block bg-neutral-800 text-gray-400 px-3 py-1 rounded text-xs uppercase mb-4">VR Production</div>
+                          <h3 className="text-3xl lg:text-4xl font-bold mb-6">Plates для <span className="text-gray-300">виртуального продакшена</span></h3>
                           <p className="text-gray-400 mb-6 text-lg">
                               Библиотека готовых панорамных видеофонов для LED-экранов и хромакей-студий.
                           </p>
@@ -1632,7 +1643,7 @@ ${projectDescription}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                               >
-                                <div className="absolute transition-all duration-1000 opacity-70 inset-0 bg-gradient-to-r from-[#FF4D4D] via-[#F9CB28] to-[#FF4D4D] rounded-full blur-md group-hover:opacity-100 group-hover:blur-lg group-hover:duration-200 animate-tilt"></div>
+                                <div className="absolute transition-all duration-1000 opacity-50 inset-0 bg-gradient-to-r from-white/30 via-gray-400/30 to-white/30 rounded-full blur-md group-hover:opacity-80 group-hover:blur-lg group-hover:duration-200"></div>
                                 <span className="relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-neutral-900 rounded-full border border-neutral-700 group-hover:bg-neutral-800">
                                   Заказать съёмку
                                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -1664,7 +1675,7 @@ ${projectDescription}
                           <div className="flex items-center justify-between mt-4">
                               <motion.button 
                                   onClick={() => setCurrentPlateVideo(prev => prev === 0 ? plateVideos.length - 1 : prev - 1)}
-                                  className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-orange-400 transition-colors"
+                                  className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors"
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.95 }}
                               >
@@ -1676,7 +1687,7 @@ ${projectDescription}
                                       <motion.button 
                                           key={idx}
                                           onClick={() => setCurrentPlateVideo(idx)}
-                                          className={`w-2 h-2 rounded-full transition-colors ${idx === currentPlateVideo ? 'bg-orange-400' : 'bg-neutral-600 hover:bg-neutral-500'}`}
+                                          className={`w-2 h-2 rounded-full transition-colors ${idx === currentPlateVideo ? 'bg-white' : 'bg-neutral-600 hover:bg-neutral-500'}`}
                                           whileHover={{ scale: 1.3 }}
                                       />
                                   ))}
@@ -1684,7 +1695,7 @@ ${projectDescription}
                               
                               <motion.button 
                                   onClick={() => setCurrentPlateVideo(prev => prev === plateVideos.length - 1 ? 0 : prev + 1)}
-                                  className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-orange-400 transition-colors"
+                                  className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors"
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.95 }}
                               >
@@ -1704,7 +1715,7 @@ ${projectDescription}
       <section id="team" className="py-24 max-w-7xl mx-auto">
         <div className="px-4">
           <ScrollReveal>
-            <SectionTitle subtitle="Люди">Команда <span className="text-red-500">Экспертов</span></SectionTitle>
+            <SectionTitle subtitle="Люди">Команда <span className="text-gray-400">Экспертов</span></SectionTitle>
           </ScrollReveal>
           <ScrollReveal>
             <p className="text-gray-400 max-w-3xl mb-12 text-lg">Команда специалистов формируется под сложность ваших задач. Профессиональный подход экономит массу времени и средств.</p>
@@ -1724,7 +1735,7 @@ ${projectDescription}
                 exit={{ opacity: 0 }}
               >
                   <motion.div 
-                    className="bg-neutral-900 rounded-3xl border border-red-900/30 max-w-2xl w-full p-8 relative overflow-hidden" 
+                    className="bg-neutral-900 rounded-3xl border border-neutral-700 max-w-2xl w-full p-8 relative overflow-hidden" 
                     onClick={e => e.stopPropagation()}
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -1743,7 +1754,7 @@ ${projectDescription}
                           />
                           <div>
                               <h3 className="text-3xl font-bold text-white mb-2">{activeTeamMember.name}</h3>
-                              <p className="text-red-500 font-mono mb-6">{activeTeamMember.role}</p>
+                              <p className="text-gray-400 font-mono mb-6">{activeTeamMember.role}</p>
                               <p className="text-gray-300 leading-relaxed mb-6">{activeTeamMember.bio}</p>
                               {activeTeamMember.id === 1 && (
                                   <a href="https://rutube.ru/video/9557a8d928fd480964af0159a60efa11/" target="_blank" rel="noreferrer" className="inline-flex items-center text-white border border-gray-600 rounded-full px-4 py-2 hover:bg-white hover:text-black transition-colors">
@@ -1761,7 +1772,7 @@ ${projectDescription}
       {/* --- Partners Marquee --- */}
       <section className="py-24 bg-gradient-to-b from-[#0a0a0a] to-[#111] overflow-hidden border-t border-b border-neutral-800">
         <ScrollReveal className="max-w-7xl mx-auto px-4 mb-16">
-          <SectionTitle subtitle="Доверие">Нам доверяют <span className="text-red-500">лидеры</span></SectionTitle>
+          <SectionTitle subtitle="Доверие">Нам доверяют <span className="text-gray-400">лидеры</span></SectionTitle>
         </ScrollReveal>
         
         {/* Gradient overlays for smooth edges */}
@@ -1789,7 +1800,7 @@ ${projectDescription}
       <section className="py-24 bg-[#050505]">
         <div className="max-w-7xl mx-auto px-4">
           <ScrollReveal>
-            <SectionTitle subtitle="Отзывы">Что говорят <span className="text-red-500">о нас</span></SectionTitle>
+            <SectionTitle subtitle="Отзывы">Что говорят <span className="text-gray-400">о нас</span></SectionTitle>
           </ScrollReveal>
           
           <TestimonialsCarousel testimonials={testimonials} />
@@ -1800,7 +1811,7 @@ ${projectDescription}
       <footer id="contact" className="bg-[#0a0a0a] pt-24 pb-12 px-4 border-t border-neutral-800">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
             <ScrollReveal variants={fadeInLeft}>
-                <h2 className="text-5xl font-bold text-white mb-8">Давайте сделаем <br/>что-то <span className="text-red-500">великое</span>.</h2>
+                <h2 className="text-5xl font-bold text-white mb-8">Готовы обсудить <br/>ваш <span className="text-gray-400">проект</span>.</h2>
                 <div className="space-y-6 text-lg text-gray-300">
                     <motion.div 
                       className="flex items-center gap-4"
@@ -1809,8 +1820,8 @@ ${projectDescription}
                       viewport={{ once: true }}
                       transition={{ delay: 0.1 }}
                     >
-                        <Phone className="text-red-500" />
-                        <a href="tel:+79250382525" className="hover:text-red-500 transition-colors">+7 (925) 038-25-25</a>
+                        <Phone className="text-gray-400" />
+                        <a href="tel:+79250382525" className="hover:text-white transition-colors">+7 (925) 038-25-25</a>
                     </motion.div>
                     <motion.div 
                       className="flex items-center gap-4"
@@ -1819,7 +1830,7 @@ ${projectDescription}
                       viewport={{ once: true }}
                       transition={{ delay: 0.2 }}
                     >
-                        <Mail className="text-red-500" />
+                        <Mail className="text-gray-400" />
                         <span>hello@kinogorynych.ru</span>
                     </motion.div>
                     <motion.div 
@@ -1829,8 +1840,8 @@ ${projectDescription}
                       viewport={{ once: true }}
                       transition={{ delay: 0.3 }}
                     >
-                        <MapPin className="text-red-500" />
-                        <a href="https://yandex.ru/maps/-/CLh-yMlJ" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">Москва, Алтуфьевское шоссе, 3с1</a>
+                        <MapPin className="text-gray-400" />
+                        <a href="https://yandex.ru/maps/-/CLh-yMlJ" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Москва, Алтуфьевское шоссе, 3с1</a>
                     </motion.div>
                     <motion.div 
                       className="mt-6 pt-6 border-t border-neutral-700 text-sm text-gray-400"
@@ -1856,7 +1867,7 @@ ${projectDescription}
                        href="https://t.me/kino_gorynich" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"
+                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors cursor-pointer"
                        whileHover={{ scale: 1.1, rotate: 5 }}
                        whileTap={{ scale: 0.95 }}
                      >
@@ -1866,7 +1877,7 @@ ${projectDescription}
                        href="https://rutube.ru/channel/129861/" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer"
+                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors cursor-pointer"
                        whileHover={{ scale: 1.1, rotate: -5 }}
                        whileTap={{ scale: 0.95 }}
                      >
@@ -1876,7 +1887,7 @@ ${projectDescription}
                        href="https://vk.com/kino_gorynich" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors cursor-pointer"
+                       className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors cursor-pointer"
                        whileHover={{ scale: 1.1, rotate: 5 }}
                        whileTap={{ scale: 0.95 }}
                      >
@@ -1894,7 +1905,7 @@ ${projectDescription}
                           type="text" 
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none transition-colors" 
+                          className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors" 
                           placeholder="Иван Иванов" 
                         />
                     </div>
@@ -1906,10 +1917,10 @@ ${projectDescription}
                           onChange={handlePhoneChange}
                           onFocus={handlePhoneFocus}
                           onBlur={handlePhoneBlur}
-                          className={`w-full bg-black border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-red-500 outline-none transition-colors ${phoneError ? 'border-red-500' : 'border-neutral-700'}`}
+                          className={`w-full bg-black border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-white outline-none transition-colors ${phoneError ? 'border-gray-400' : 'border-neutral-700'}`}
                           placeholder="+7 (999) 123-45-67" 
                         />
-                        {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
+                        {phoneError && <p className="text-gray-400 text-xs mt-1">{phoneError}</p>}
                     </div>
                     <div>
                         <label className="block text-sm text-gray-500 mb-2">О проекте</label>
@@ -1917,13 +1928,13 @@ ${projectDescription}
                           rows="4" 
                           value={projectDescription}
                           onChange={(e) => setProjectDescription(e.target.value)}
-                          className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-red-500 outline-none transition-colors" 
+                          className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors" 
                           placeholder="Расскажите нам немного о вашей идее..."
                         ></textarea>
                     </div>
                     
                     {submitStatus.message && (
-                      <div className={`p-4 rounded-xl text-sm ${submitStatus.type === 'success' ? 'bg-green-900/50 text-green-300 border border-green-700' : 'bg-red-900/50 text-red-300 border border-red-700'}`}>
+                      <div className={`p-4 rounded-xl text-sm ${submitStatus.type === 'success' ? 'bg-neutral-800 text-gray-300 border border-gray-600' : 'bg-neutral-800 text-gray-300 border border-gray-600'}`}>
                         {submitStatus.message}
                       </div>
                     )}
@@ -1931,7 +1942,7 @@ ${projectDescription}
                     <button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-gradient-to-r from-red-600 to-yellow-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? 'Отправляем...' : 'Отправить форму'}
                     </button>
@@ -1941,7 +1952,7 @@ ${projectDescription}
                       <button 
                         type="button"
                         onClick={() => setIsPrivacyOpen(true)} 
-                        className="text-red-500 hover:underline"
+                        className="text-gray-400 hover:underline"
                       >
                         политикой конфиденциальности
                       </button>
@@ -1980,13 +1991,13 @@ ${projectDescription}
             >
               <button 
                 onClick={() => setIsPlatesBriefOpen(false)}
-                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-red-600 transition-colors"
+                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-white hover:text-black transition-colors"
               >
                 <X size={20} />
               </button>
             
             <div className="mb-6">
-              <div className="inline-block bg-orange-900/30 text-orange-400 px-3 py-1 rounded text-xs uppercase mb-3">Бриф</div>
+              <div className="inline-block bg-neutral-800 text-gray-400 px-3 py-1 rounded text-xs uppercase mb-3">Бриф</div>
               <h3 className="text-2xl md:text-3xl font-bold">Заказать съёмку видеофонов</h3>
               <p className="text-gray-400 mt-2 text-sm">Заполните форму, чтобы мы рассчитали стоимость вашего запроса</p>
             </div>
@@ -2000,7 +2011,7 @@ ${projectDescription}
                     type="text"
                     value={platesBrief.contactName}
                     onChange={(e) => handlePlatesBriefChange('contactName', e.target.value)}
-                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 outline-none transition-colors"
+                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors"
                     placeholder="Иван Иванов"
                     required
                   />
@@ -2011,7 +2022,7 @@ ${projectDescription}
                     type="text"
                     value={platesBrief.contactInfo}
                     onChange={(e) => handlePlatesBriefChange('contactInfo', e.target.value)}
-                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 outline-none transition-colors"
+                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors"
                     placeholder="Telegram, почта или телефон"
                     required
                   />
@@ -2025,7 +2036,7 @@ ${projectDescription}
                     type="text"
                     value={platesBrief.company}
                     onChange={(e) => handlePlatesBriefChange('company', e.target.value)}
-                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 outline-none transition-colors"
+                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors"
                     placeholder="ООО, ИП, НКО"
                   />
                 </div>
@@ -2035,7 +2046,7 @@ ${projectDescription}
                     type="text"
                     value={platesBrief.project}
                     onChange={(e) => handlePlatesBriefChange('project', e.target.value)}
-                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 outline-none transition-colors"
+                    className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors"
                     placeholder="Рабочее название"
                   />
                 </div>
@@ -2043,14 +2054,14 @@ ${projectDescription}
 
               {/* Параметры съёмки */}
               <div className="border-t border-neutral-700 pt-4 mt-4">
-                <p className="text-sm text-orange-400 font-semibold mb-3">Параметры съёмки</p>
+                <p className="text-sm text-gray-400 font-semibold mb-3">Параметры съёмки</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Местность</label>
                     <select 
                       value={platesBrief.location}
                       onChange={(e) => handlePlatesBriefChange('location', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>Москва/крупный город</option>
                       <option>Небольшой город</option>
@@ -2064,7 +2075,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.season}
                       onChange={(e) => handlePlatesBriefChange('season', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>Весна</option>
                       <option>Лето</option>
@@ -2077,7 +2088,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.weather}
                       onChange={(e) => handlePlatesBriefChange('weather', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>Солнце</option>
                       <option>Облачно</option>
@@ -2091,7 +2102,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.timeOfDay}
                       onChange={(e) => handlePlatesBriefChange('timeOfDay', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>День</option>
                       <option>Утро</option>
@@ -2105,7 +2116,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.carsCount}
                       onChange={(e) => handlePlatesBriefChange('carsCount', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>нет машин</option>
                       <option>мало (1-3)</option>
@@ -2118,7 +2129,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.carHeight}
                       onChange={(e) => handlePlatesBriefChange('carHeight', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>легковая</option>
                       <option>кроссовер/внедорожник</option>
@@ -2132,7 +2143,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.cameraAngle}
                       onChange={(e) => handlePlatesBriefChange('cameraAngle', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>горизонт</option>
                       <option>вверх</option>
@@ -2146,7 +2157,7 @@ ${projectDescription}
                       type="text"
                       value={platesBrief.speed}
                       onChange={(e) => handlePlatesBriefChange('speed', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl px-2 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl px-2 py-2 text-white text-sm focus:border-white outline-none"
                       placeholder="60"
                     />
                   </div>
@@ -2156,7 +2167,7 @@ ${projectDescription}
                       type="text"
                       value={platesBrief.duration}
                       onChange={(e) => handlePlatesBriefChange('duration', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl px-2 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl px-2 py-2 text-white text-sm focus:border-white outline-none"
                       placeholder="5 мин"
                     />
                   </div>
@@ -2165,14 +2176,14 @@ ${projectDescription}
 
               {/* Дополнительные опции */}
               <div className="border-t border-neutral-700 pt-4 mt-4">
-                <p className="text-sm text-orange-400 font-semibold mb-3">Дополнительные опции</p>
+                <p className="text-sm text-gray-400 font-semibold mb-3">Дополнительные опции</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Вид лицензии</label>
                     <select 
                       value={platesBrief.licenseType}
                       onChange={(e) => handlePlatesBriefChange('licenseType', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>Неисключительная</option>
                       <option>Исключительная</option>
@@ -2183,7 +2194,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.supervising}
                       onChange={(e) => handlePlatesBriefChange('supervising', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>да</option>
                       <option>нет</option>
@@ -2194,7 +2205,7 @@ ${projectDescription}
                     <select 
                       value={platesBrief.stitching}
                       onChange={(e) => handlePlatesBriefChange('stitching', e.target.value)}
-                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-orange-500 outline-none"
+                      className="w-full bg-black border border-neutral-700 rounded-xl pl-2 pr-6 py-2 text-white text-sm focus:border-white outline-none"
                     >
                       <option>да</option>
                       <option>нет</option>
@@ -2210,7 +2221,7 @@ ${projectDescription}
                   rows="3"
                   value={platesBrief.notes}
                   onChange={(e) => handlePlatesBriefChange('notes', e.target.value)}
-                  className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 outline-none transition-colors"
+                  className="w-full bg-black border border-neutral-700 rounded-xl px-4 py-3 text-white focus:border-white outline-none transition-colors"
                   placeholder="Укажите всё, что считаете важным..."
                 ></textarea>
               </div>
@@ -2220,7 +2231,7 @@ ${projectDescription}
               </p>
 
               {platesBriefStatus.message && (
-                <div className={`p-4 rounded-xl text-sm ${platesBriefStatus.type === 'success' ? 'bg-green-900/50 text-green-300 border border-green-700' : 'bg-red-900/50 text-red-300 border border-red-700'}`}>
+                <div className={`p-4 rounded-xl text-sm ${platesBriefStatus.type === 'success' ? 'bg-neutral-800 text-gray-300 border border-gray-600' : 'bg-neutral-800 text-gray-300 border border-gray-600'}`}>
                   {platesBriefStatus.message}
                 </div>
               )}
@@ -2228,13 +2239,53 @@ ${projectDescription}
               <motion.button 
                 type="submit"
                 disabled={platesBriefSubmitting}
-                className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 {platesBriefSubmitting ? 'Отправляем...' : 'Отправить бриф'}
               </motion.button>
             </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Showreel Video Modal */}
+      <AnimatePresence>
+        {isShowreelOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsShowreelOpen(false)}
+          >
+            <motion.div
+              className="relative w-full max-w-4xl bg-neutral-900 rounded-3xl border border-neutral-700 overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setIsShowreelOpen(false)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-white hover:text-black transition-colors"
+                aria-label="Закрыть"
+              >
+                <X size={20} />
+              </button>
+              <div className="aspect-video w-full">
+                <iframe
+                  src="https://rutube.ru/play/embed/9124225796b65d2adfc0ab186798b1d2"
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Шоурил КиноГорыныч"
+                />
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -2260,7 +2311,7 @@ ${projectDescription}
             >
               <button 
                 onClick={() => setIsPrivacyOpen(false)}
-                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-red-600 transition-colors"
+                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-white hover:text-black transition-colors"
                 aria-label="Закрыть"
               >
                 <X size={20} />
@@ -2317,7 +2368,7 @@ ${projectDescription}
               
               <motion.button 
                 onClick={() => setIsPrivacyOpen(false)}
-                className="mt-8 w-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity"
+                className="mt-8 w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
