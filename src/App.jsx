@@ -20,6 +20,11 @@ const throttle = (func, limit) => {
 /* --- Custom Styles for Animations --- */
 const GlobalStyles = () => (
   <style>{`
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      position: relative;
+    }
     @keyframes scroll {
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
@@ -48,6 +53,26 @@ const GlobalStyles = () => (
     }
     .animate-tilt {
       animation: tilt 10s infinite linear;
+    }
+    @keyframes scrollVertical {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+    .animate-scroll-vertical {
+      animation: scrollVertical 20s linear infinite;
+    }
+    .animate-scroll-vertical:hover {
+      animation-play-state: paused;
+    }
+    @keyframes scrollHorizontal {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-scroll-horizontal {
+      animation: scrollHorizontal 20s linear infinite;
+    }
+    .animate-scroll-horizontal:hover {
+      animation-play-state: paused;
     }
   `}</style>
 );
@@ -95,6 +120,279 @@ const SecondaryButton = ({ text, onClick, href, className = "" }) => (
     </a>
   </button>
 );
+
+/* --- Film Strip Carousel Component --- */
+const FilmStripCarousel = ({ images = [], isMobile = false }) => {
+  // Default placeholder images if none provided
+  const defaultImages = [
+    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1574267432644-f610f5293744?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop',
+  ];
+
+  const filmImages = images.length > 0 ? images : defaultImages;
+  
+  // Calculate animation duration - different speeds for mobile and desktop
+  const animationDuration = useMemo(() => {
+    if (isMobile) {
+      return filmImages.length * 6; // 2 seconds per image - faster on mobile
+    }
+    return filmImages.length * 7; // 4 seconds per image - slower on desktop
+  }, [filmImages.length, isMobile]);
+
+  if (isMobile) {
+    // Mobile horizontal version with CSS animation
+    return (
+      <div className="relative w-full h-44 overflow-hidden pointer-events-none mt-35">
+        {/* Film strip border effect */}
+        <div className="absolute inset-x-0 top-0 h-3 bg-gradient-to-b from-neutral-800/80 to-transparent z-20"></div>
+        <div className="absolute inset-x-0 bottom-0 h-3 bg-gradient-to-t from-neutral-800/80 to-transparent z-20"></div>
+        
+        {/* Film perforations on top */}
+        <div className="absolute top-1 left-0 w-full flex flex-row justify-around z-20">
+          {[...Array(15)].map((_, i) => (
+            <div key={`perf-top-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+          ))}
+        </div>
+        
+        {/* Film perforations on bottom */}
+        <div className="absolute bottom-1 left-0 w-full flex flex-row justify-around z-20">
+          {[...Array(15)].map((_, i) => (
+            <div key={`perf-bottom-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+          ))}
+        </div>
+
+        {/* CSS Animation for horizontal scroll */}
+        <style>{`
+          @keyframes filmScrollHorizontal {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(-50%, 0, 0); }
+          }
+          .film-scroll-horizontal {
+            animation: filmScrollHorizontal ${animationDuration}s linear infinite;
+            will-change: transform;
+            backface-visibility: hidden;
+          }
+        `}</style>
+
+        {/* Two identical tracks for perfect seamless loop */}
+        <div className="flex items-center h-full film-scroll-horizontal py-4" style={{ width: 'max-content' }}>
+          {/* Track 1 */}
+          <div className="flex flex-row gap-3 pr-3 h-full">
+            {filmImages.map((img, index) => (
+              <div 
+                key={`a-${index}`} 
+                className="relative flex-shrink-0 h-full aspect-square bg-neutral-800 rounded-sm overflow-hidden border-2 border-neutral-700 shadow-2xl"
+              >
+                <img 
+                  src={img} 
+                  alt={`Film frame ${index + 1}`}
+                  className="w-full h-full object-cover opacity-90"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/20 pointer-events-none"></div>
+              </div>
+            ))}
+          </div>
+          {/* Track 2 (identical copy) */}
+          <div className="flex flex-row gap-3 pr-3 h-full">
+            {filmImages.map((img, index) => (
+              <div 
+                key={`b-${index}`} 
+                className="relative flex-shrink-0 h-full aspect-square bg-neutral-800 rounded-sm overflow-hidden border-2 border-neutral-700 shadow-2xl"
+              >
+                <img 
+                  src={img} 
+                  alt={`Film frame ${index + 1}`}
+                  className="w-full h-full object-cover opacity-90"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/20 pointer-events-none"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gradient fade at left and right - shorter and softer */}
+        <div className="absolute top-0 left-0 bottom-0 w-16 bg-gradient-to-r from-[#050505]/95 via-[#050505]/60 to-transparent z-30 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-[#050505]/95 via-[#050505]/60 to-transparent z-30 pointer-events-none"></div>
+      </div>
+    );
+  }
+
+  // Desktop vertical version with CSS animation
+  return (
+    <div className="absolute right-0 top-0 h-full w-48 md:w-64 lg:w-80 overflow-hidden z-10 pointer-events-none">
+      {/* Film strip border effect */}
+      <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-neutral-800/80 to-transparent z-20"></div>
+      <div className="absolute inset-y-0 right-0 w-3 bg-gradient-to-l from-neutral-800/80 to-transparent z-20"></div>
+      
+      {/* Film perforations on left */}
+      <div className="absolute left-1 top-0 h-full flex flex-col justify-around z-20">
+        {[...Array(20)].map((_, i) => (
+          <div key={`perf-left-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+        ))}
+      </div>
+      
+      {/* Film perforations on right */}
+      <div className="absolute right-1 top-0 h-full flex flex-col justify-around z-20">
+        {[...Array(20)].map((_, i) => (
+          <div key={`perf-right-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+        ))}
+      </div>
+
+      {/* CSS Animation for vertical scroll */}
+      <style>{`
+        @keyframes filmScrollVertical {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(0, -50%, 0); }
+        }
+        .film-scroll-vertical {
+          animation: filmScrollVertical ${animationDuration}s linear infinite;
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+      `}</style>
+
+      {/* Two identical tracks for perfect seamless loop */}
+      <div className="flex flex-col px-5 film-scroll-vertical" style={{ height: 'max-content' }}>
+        {/* Track 1 */}
+        <div className="flex flex-col gap-4 pb-4">
+          {filmImages.map((img, index) => (
+            <div 
+              key={`a-${index}`} 
+              className="relative flex-shrink-0 w-full aspect-square bg-neutral-800 rounded-sm overflow-hidden border-2 border-neutral-700 shadow-2xl"
+            >
+              <img 
+                src={img} 
+                alt={`Film frame ${index + 1}`}
+                className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/20 pointer-events-none"></div>
+            </div>
+          ))}
+        </div>
+        {/* Track 2 (identical copy) */}
+        <div className="flex flex-col gap-4 pb-4">
+          {filmImages.map((img, index) => (
+            <div 
+              key={`b-${index}`} 
+              className="relative flex-shrink-0 w-full aspect-square bg-neutral-800 rounded-sm overflow-hidden border-2 border-neutral-700 shadow-2xl"
+            >
+              <img 
+                src={img} 
+                alt={`Film frame ${index + 1}`}
+                className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/20 pointer-events-none"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Gradient fade at top and bottom */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#050505] to-transparent z-30 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#050505] to-transparent z-30 pointer-events-none"></div>
+    </div>
+  );
+};
+
+/* --- Filmography Film Card --- */
+const FilmCard = ({ film }) => (
+  <div className="relative flex-shrink-0 h-[320px] group">
+    <div className="relative h-full aspect-[3/4] bg-neutral-700 rounded-sm overflow-hidden border-2 border-neutral-600/60 shadow-2xl">
+      <img 
+        src={film.image} 
+        alt={film.name}
+        className="w-full h-full object-cover opacity-90 transition-all duration-500 grayscale-[15%]"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/5 via-transparent to-black/20 pointer-events-none mix-blend-multiply"></div>
+      <div className="absolute inset-0 bg-amber-900/4 pointer-events-none mix-blend-overlay"></div>
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+        <h4 className="text-white font-bold text-sm mb-1 line-clamp-2 drop-shadow-lg">{film.name}</h4>
+        <p className="text-gray-300 text-xs drop-shadow-md">{film.date}</p>
+      </div>
+    </div>
+  </div>
+);
+
+/* --- Filmography Carousel Component (Horizontal) --- */
+const FilmographyCarousel = ({ films = [] }) => {
+  // Animation durations per film for different devices
+  const mobileSeconds = 4;   // секунды на фильм - МОБИЛЬНАЯ
+  const desktopSeconds = 3.5; // секунды на фильм - ДЕСКТОП
+
+  const mobileDuration = films.length * mobileSeconds;
+  const desktopDuration = films.length * desktopSeconds;
+
+  return (
+    <div className="relative w-full h-[400px] overflow-hidden pointer-events-none bg-neutral-800/40 rounded-2xl">
+      {/* Film strip border effect */}
+      <div className="absolute inset-x-0 top-0 h-3 bg-gradient-to-b from-neutral-700/50 to-transparent z-20"></div>
+      <div className="absolute inset-x-0 bottom-0 h-3 bg-gradient-to-t from-neutral-700/50 to-transparent z-20"></div>
+      
+      {/* Film perforations on top */}
+      <div className="absolute top-1 left-0 w-full flex flex-row justify-around z-20">
+        {[...Array(40)].map((_, i) => (
+          <div key={`perf-top-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+        ))}
+      </div>
+      
+      {/* Film perforations on bottom */}
+      <div className="absolute bottom-1 left-0 w-full flex flex-row justify-around z-20">
+        {[...Array(40)].map((_, i) => (
+          <div key={`perf-bottom-${i}`} className="w-2 h-2 bg-neutral-900 rounded-sm"></div>
+        ))}
+      </div>
+
+      {/* CSS animation with media queries */}
+      <style>{`
+        @keyframes filmographyScroll {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-50%, 0, 0); }
+        }
+        .filmography-scroll {
+          animation: filmographyScroll ${mobileDuration}s linear infinite;
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+        @media (min-width: 768px) {
+          .filmography-scroll {
+            animation-duration: ${desktopDuration}s;
+          }
+        }
+      `}</style>
+
+      {/* Two identical tracks side by side for perfect seamless loop */}
+      <div className="flex h-full items-center filmography-scroll" style={{ width: 'max-content' }}>
+        {/* Track 1 */}
+        <div className="flex flex-row gap-6 pr-6">
+          {films.map((film, index) => (
+            <FilmCard key={`a-${index}`} film={film} />
+          ))}
+        </div>
+        {/* Track 2 (identical copy) */}
+        <div className="flex flex-row gap-6 pr-6">
+          {films.map((film, index) => (
+            <FilmCard key={`b-${index}`} film={film} />
+          ))}
+        </div>
+      </div>
+
+      {/* Gradient fade at left and right */}
+      <div className="absolute top-0 left-0 bottom-0 w-20 md:w-28 bg-gradient-to-r from-[#050505]/95 via-[#050505]/50 to-transparent z-30 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-20 md:w-28 bg-gradient-to-l from-[#050505]/95 via-[#050505]/50 to-transparent z-30 pointer-events-none"></div>
+    </div>
+  );
+};
 
 /* --- Framer Motion Animation Components --- */
 
@@ -761,6 +1059,8 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
   const [currentPlateVideo, setCurrentPlateVideo] = useState(0);
+  const [currentStabilizationVideo, setCurrentStabilizationVideo] = useState(0);
+  const [currentPlatesBackground, setCurrentPlatesBackground] = useState(0);
   const [isPlatesBriefOpen, setIsPlatesBriefOpen] = useState(false);
   const [platesBriefSubmitting, setPlatesBriefSubmitting] = useState(false);
   const [platesBriefStatus, setPlatesBriefStatus] = useState({ type: '', message: '' });
@@ -794,11 +1094,90 @@ export default function App() {
     { id: '58bc3edcfb694e2d38fd3f4f14f5af1c', title: 'Удобство для режиссёров'},
   ];
 
+  // Видео для блока "Система стабилизации Горыныч" (вставьте ID видео Rutube)
+  const stabilizationVideos = [
+    { id: '452b2990c39ef3aa481ccddb3e01b80c', title: 'Система стабилизации Горыныч' },
+    { id: '9124225796b65d2adfc0ab186798b1d2', title: 'Готовые панорамы для виртуального продакшна' },
+  ];
+
   // ID видео для блока "Соловей" (вставьте ID видео Rutube)
   const soloveyVideoId = '5613cbfd38afa4b6ab28d3ca843f12cb';
 
-  // ID видео для блока "Система стабилизации Горыныч" (вставьте ID видео Rutube)
-  const stabilizationVideoId = '452b2990c39ef3aa481ccddb3e01b80c';
+  // Фоновые изображения для блока Plates
+  const platesBackgroundImages = [
+    '/kgcar2.jpg',
+    '/kgcar3.jpg',
+    '/kgcar4.jpg'
+  ];
+
+  // Данные фильмографии (добавьте свои фильмы)
+  const filmography = [
+    {
+      name: 'Кентавр',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild6465-3865-4433-b132-373562623266/WhatsApp_Image_2023-.jpeg'
+    },
+    {
+      name: 'Вызов',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild3932-3261-4330-a137-333966376230/07EDF78C-41A1-4CD0-A.jpeg'
+    },
+    {
+      name: 'Аврора',
+      date: '2022',
+      image: 'https://static.tildacdn.com/tild3934-3934-4636-b839-643430343932/5__6.jpg'
+    },
+    {
+      name: 'Мажор 4',
+      date: '2022',
+      image: 'https://static.tildacdn.com/tild3335-6635-4863-b439-346634373662/5__1.jpg'
+    },
+    {
+      name: 'Скорая Помощь 6',
+      date: '2022',
+      image: 'https://static.tildacdn.com/tild6337-3834-4464-b765-623166613437/5__2.jpg'
+    },
+    {
+      name: 'Чайки',
+      date: '2022',
+      image: 'https://static.tildacdn.com/tild3831-6233-4338-a363-643539653861/WhatsApp_Image_2023-.jpeg'
+    },
+    {
+      name: 'И снова здравствуйте!',
+      date: '2021',
+      image: 'https://static.tildacdn.com/tild3033-3631-4363-b166-373031666330/5__4.jpg'
+    },
+    {
+      name: 'День слепого Валентина',
+      date: '2021',
+      image: 'https://static.tildacdn.com/tild3064-3531-4030-a533-306363396535/5__8.jpg'
+    },
+    {
+      name: 'ЗАТО',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild3233-3337-4538-b834-623762393433/5__7.jpg'
+    },
+    {
+      name: 'Миссия в Москве',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild6230-6134-4234-a635-373135643064/photo_2024-02-05_161.jpeg'
+    },
+    {
+      name: 'Баба Мороз и тайна Нового года',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild3461-3536-4762-a538-626434613335/IMG_3563.jpeg'
+    },
+    {
+      name: 'Омар в большом городе 2',
+      date: '2021',
+      image: 'https://static.tildacdn.com/tild3833-6336-4336-a666-646365343662/WhatsApp_Image_2023-.jpeg'
+    },
+    {
+      name: 'Кеша должен умереть',
+      date: '2023',
+      image: 'https://static.tildacdn.com/tild6131-3835-4236-a639-376561353861/IMG_2916.jpeg'
+    },
+  ];
 
   // Данные отзывов
   const testimonials = [
@@ -1097,6 +1476,14 @@ ${projectDescription}
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPrivacyOpen, activeTeamMember, isPlatesBriefOpen, isMenuOpen]);
 
+  // Автоматическое переключение фоновых изображений для блока Plates каждые 4 секунды
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPlatesBackground(prev => (prev + 1) % 3); // Hardcoded length for performance
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array - runs once
+
   const teamData = [
     {
       id: 1,
@@ -1116,12 +1503,12 @@ ${projectDescription}
       desc: "Визуальные миры, раскрывающие философию трека.", 
       quote: "Я люблю музыку, поэтому съемка клипов для меня — это настоящий драйв!", 
       author: "И.А. Поморин",
+      tagline: "Превращаем музыку в визуальное искусство",
       videos: [
-        { id: "962e55c1fed1ffdf774a0d48dfdc57b4", title: "Клип 1" },  // Вставьте ID видео Rutube
-        { id: "08c7513d18f12de1bede54801e2354ff", title: "Клип 2" },
-        { id: "daa750f156f7db418201bc58e68da76d", title: "Клип 3" },
-        { id: "6a976d31b9b04e19a71ad948a226efdd", title: "Клип 4" },
-        { id: "29eed5dfd3ba9d54d44a4d14d41f5890", title: "Клип 5" },
+        { id: "08c7513d18f12de1bede54801e2354ff", title: "Клип 1" },
+        { id: "daa750f156f7db418201bc58e68da76d", title: "Клип 2" },
+        { id: "6a976d31b9b04e19a71ad948a226efdd", title: "Клип 3" },
+        { id: "29eed5dfd3ba9d54d44a4d14d41f5890", title: "Клип 4" },
       ]
     },
     { 
@@ -1129,6 +1516,7 @@ ${projectDescription}
       desc: "Продающие истории с профессиональной картинкой.", 
       quote: "В нашем мире внимание — главный ресурс! Мы снимаем контент, который цепляет.", 
       author: "КиноГорыныч",
+      tagline: "Контент, который продает и запоминается",
       videos: [
         { id: "19e2bbb3658059a43469c67ec142b745", title: "Реклама 1" },
         { id: "8776b17768745b2e3d480bd14eb6a671", title: "Реклама 2" },
@@ -1142,6 +1530,7 @@ ${projectDescription}
       desc: "Масштабные видеопортреты компаний.", 
       quote: "Транслируем ваши ценности, миссию и статус через киноязык.", 
       author: "КиноГорыныч",
+      tagline: "Ваша история достойна большого экрана",
       videos: [
         { id: "", title: "Имидж 1" },
         { id: "", title: "Имидж 2" },
@@ -1153,11 +1542,12 @@ ${projectDescription}
     },
     { 
       title: "Многокамерная съемка", 
-      desc: "Драйв и масштаб ваших событий. До 8 камер, прямой эфир, трансляции.", 
+      desc: "Драйв и масштаб ваших событий. От 2 до 20 камер, прямой эфир.", 
       quote: "Прямой эфир — это ответственное мероприятие, где нет права на ошибку.", 
       author: "КиноГорыныч",
+      tagline: "Захватываем каждый момент вашего события",
       videos: [
-        { id: "", title: "Мероприятие 1" },
+        { id: "962e55c1fed1ffdf774a0d48dfdc57b4", title: "Мероприятие 1" },
         { id: "", title: "Мероприятие 2" },
         { id: "", title: "Мероприятие 3" },
         { id: "", title: "Мероприятие 4" },
@@ -1170,6 +1560,7 @@ ${projectDescription}
       desc: "Динамичные ролики и тренды без потери качества.", 
       quote: "Адаптируем большой продакшн под экраны смартфонов.", 
       author: "КиноГорыныч",
+      tagline: "Профессиональное качество в формате соцсетей",
       videos: [
         { id: "", title: "SMM 1" },
         { id: "", title: "SMM 2" },
@@ -1184,6 +1575,7 @@ ${projectDescription}
       desc: "Глубокие истории и смыслы.", 
       quote: "Истории, которые вдохновляют зрителя и остаются в вечности.", 
       author: "КиноГорыныч",
+      tagline: "Истории, которые меняют мировоззрение",
       videos: [
         { id: "", title: "Док 1" },
         { id: "", title: "Док 2" },
@@ -1218,12 +1610,22 @@ ${projectDescription}
             <img src="/gorh1.png" alt="КиноГорыныч" className="h-8 w-auto object-contain" />
           </a>
           
+          {/* Навигационное меню:
+              - О нас: История компании, опыт, преимущества
+              - Услуги: Полный список услуг продакшна
+              - Фильмография: Портфолио проектов с кинолентой
+              - Технологии: Инновации (VR Production, Plates, Соловей, Горыныч)
+              - Команда: Профессионалы КиноГорыныч
+              - Контакты: Форма связи и контактная информация
+          */}
           <div className="hidden md:flex gap-8 text-sm font-medium text-gray-300">
             {[
               { href: 'about', label: 'О нас' },
               { href: 'services', label: 'Услуги' },
+              { href: 'filmography', label: 'Фильмография' },
               { href: 'tech', label: 'Технологии' },
-              { href: 'team', label: 'Команда' }
+              { href: 'team', label: 'Команда' },
+              { href: 'contact', label: 'Контакты' }
             ].map((link, idx) => (
               <motion.a 
                 key={link.href}
@@ -1271,8 +1673,10 @@ ${projectDescription}
             {[
               { href: 'about', label: 'О нас' },
               { href: 'services', label: 'Услуги' },
+              { href: 'filmography', label: 'Фильмография' },
               { href: 'tech', label: 'Технологии' },
-              { href: 'team', label: 'Команда' }
+              { href: 'team', label: 'Команда' },
+              { href: 'contact', label: 'Контакты' }
             ].map((link, idx) => (
               <motion.a 
                 key={link.href}
@@ -1291,7 +1695,7 @@ ${projectDescription}
       </AnimatePresence>
 
       {/* --- Hero Section --- */}
-      <header className="relative h-screen flex items-center justify-center overflow-hidden bg-[#050505]">
+      <header className="relative h-screen flex items-center justify-center overflow-hidden bg-[#050505] w-full max-w-[100vw]">
         <div className="absolute inset-0 w-full h-full bg-[#050505]">
           <Aurora
             colorStops={auroraColorStops}
@@ -1302,30 +1706,56 @@ ${projectDescription}
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] z-10"></div>
         
+        {/* Film Strip Carousel - Desktop (vertical on right) */}
+        <div className="hidden md:block">
+          <FilmStripCarousel isMobile={false} />
+        </div>
+        
         <motion.div 
-          className="relative z-20 text-center px-4 max-w-5xl mx-auto"
+          className="relative z-20 text-center px-0 w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
+          {/* Background Image - Mobile: centered, Desktop: top-left */}
+          <div 
+            className="absolute z-0 pointer-events-none
+                       left-1/2 -translate-x-1/2 top-[80px]
+                       md:left-8 md:top-24 md:translate-x-0
+                       w-[280px] h-[280px] md:w-[300px] md:h-[300px]
+                       opacity-15"
+          >
+            <img 
+              src="/kinogorinichbg0.png" 
+              alt="Background Top"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          {/* Background Image 2 - Bottom Right (Desktop only) */}
+          <div 
+            className="hidden md:block absolute z-0 pointer-events-none
+                       md:right-[280px] md:bottom-12
+                       lg:right-[400px] lg:bottom-16
+                       md:w-[280px] md:h-[280px]
+                       opacity-15"
+          >
+            <img 
+              src="/kinogorinichbg0.png" 
+              alt="Background Bottom"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
           <motion.h1 
-            className="text-5xl md:text-7xl lg:text-9xl font-black text-white mb-6 leading-none tracking-tighter"
+            className="relative z-10 text-2xl md:text-6xl lg:text-5xl font-black text-white mb-36 leading-tight tracking-tight mt-[-15px] md:mt-0 px-5 md:px-0 md:max-w-[calc(100vw-320px)] md:mx-auto lg:max-w-[calc(100vw-384px)]"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            КИНО<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-400">ГОРЫНЫЧ</span>
+            <span className="inline-block md:-translate-x-52">История, которую увидят.</span><br/>
+            <span className="inline-block md:translate-x-8">Эмоция, которую запомнят.</span>
           </motion.h1>
-          <motion.p 
-            className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.4 }}
-          >
-            Эксперт в создании визуального контента любого уровня сложности. <br/>
-            <span className="text-gray-400">Огонь в каждом кадре.</span>
-          </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1340,6 +1770,16 @@ ${projectDescription}
               }}
             />
           </motion.div>
+          
+          {/* Film Strip Carousel - Mobile (horizontal below button) */}
+          <motion.div
+            className="md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.75, duration: 0.4 }}
+          >
+            <FilmStripCarousel isMobile={true} />
+          </motion.div>
         </motion.div>
       </header>
 
@@ -1347,7 +1787,7 @@ ${projectDescription}
       <section id="about" className="py-24 px-4 md:px-8 max-w-7xl mx-auto">
         <ScrollReveal>
           <SectionTitle subtitle="Кто мы">
-            От масштабного кино до <br/><span className="text-neutral-500">виртуального продакшена</span>
+            От масштабного кино до <br/><span className="text-neutral-500">виртуального продакшна</span>
           </SectionTitle>
         </ScrollReveal>
 
@@ -1467,7 +1907,7 @@ ${projectDescription}
                                 </blockquote>
                                 <p className="text-gray-300 mb-8">{service.desc}</p>
                                 <p className="text-sm font-bold text-white/50 mb-8 uppercase tracking-widest text-xs">
-                                    Мы поднимаем ваш проект до уровня кино
+                                    {service.tagline}
                                 </p>
                                 <a href="#contact" className="text-white border-b border-gray-500 pb-1 hover:text-gray-400 transition-colors">Обсудить проект &rarr;</a>
                             </motion.div>
@@ -1492,6 +1932,43 @@ ${projectDescription}
         </div>
       </section>
 
+      {/* --- Filmography Section --- */}
+      <section id="filmography" className="py-24 bg-[#050505] text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 mb-16">
+          <div className="text-center max-w-3xl mx-auto">
+            <ScrollReveal>
+              <SectionTitle subtitle="Наши работы">Фильмография</SectionTitle>
+            </ScrollReveal>
+            
+            <ScrollReveal variants={fadeInUp}>
+              <p className="text-gray-400 text-lg leading-relaxed mb-6">
+                За годы работы мы приняли участие в создании множества кинопроектов, 
+                рекламных роликов и музыкальных клипов. Наше оборудование и технологии 
+                помогли режиссёрам воплотить их творческие замыслы в жизнь.
+              </p>
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <Film className="w-5 h-5 text-gray-400" />
+                  <span>Более 50 проектов</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Camera className="w-5 h-5 text-gray-400" />
+                  <span>Работа с ведущими студиями</span>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+
+        {/* Horizontal Film carousel - Full width */}
+        <ScrollReveal variants={fadeInUp}>
+          <FilmographyCarousel films={filmography} />
+        </ScrollReveal>
+
+        {/* Background gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] pointer-events-none"></div>
+      </section>
+
       {/* --- Tech Block: Virtual Production & Solovey --- */}
       <section id="tech" className="py-24 bg-neutral-900 text-white relative overflow-hidden">
         {/* Decorative elements */}
@@ -1503,8 +1980,18 @@ ${projectDescription}
             </ScrollReveal>
             
             {/* Tech 1: VR Production */}
-            <div className="grid md:grid-cols-2 gap-12 mb-32 items-center">
-                <ScrollReveal variants={fadeInLeft} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-12 mb-32 items-center relative py-16 px-8 rounded-3xl overflow-hidden">
+                {/* Фоновое изображение */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                    <img 
+                        src="/kgcar1.jpeg" 
+                        alt="Background" 
+                        className="w-full h-full object-cover scale-x-[-1]"
+                        style={{ opacity: 0.15 }}
+                    />
+                </div>
+                
+                <ScrollReveal variants={fadeInLeft} className="space-y-6 relative z-10">
                     <h3 className="text-3xl font-bold text-white">Виртуальный продакшн & Стабилизация</h3>
                     <p className="text-gray-300 leading-relaxed">
                         Мы представляем лучшее решение для съемки фонов под CG или VR. Наш архив кинофонов и уникальные технологии позволяют снимать автомобильные сцены на высшем уровне.
@@ -1524,35 +2011,81 @@ ${projectDescription}
                         </li>
                     </ul>
                 </ScrollReveal>
-                <ScrollReveal variants={fadeInRight}>
-                  <div className="relative h-[400px] rounded-3xl overflow-hidden border border-neutral-700 group">
-                      {stabilizationVideoId && stabilizationVideoId.trim() !== '' ? (
-                        // Если есть ID видео - показываем iframe Rutube
-                        <iframe 
-                          src={`https://rutube.ru/play/embed/${stabilizationVideoId}`}
-                          className="w-full h-full rounded-3xl"
-                          frameBorder="0"
-                          allow="autoplay; fullscreen"
-                          allowFullScreen
-                          title="Система стабилизации Горыныч"
-                        ></iframe>
-                      ) : (
-                        // Плейсхолдер если ID не заполнен
-                        <>
-                          <img src="https://placehold.co/800x600/111/444?text=VR+Rig+Setup" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt="Rig" />
-                          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent pointer-events-none">
-                              <p className="text-xl font-bold">Система стабилизации "Горыныч"</p>
+                <ScrollReveal variants={fadeInRight} className="relative z-10">
+                  <motion.div 
+                    className="relative"
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                  >
+                      <div className="aspect-video bg-black rounded-2xl overflow-hidden border border-neutral-700">
+                          {stabilizationVideos[currentStabilizationVideo].id && stabilizationVideos[currentStabilizationVideo].id.trim() !== '' ? (
+                            <iframe 
+                              src={`https://rutube.ru/play/embed/${stabilizationVideos[currentStabilizationVideo].id}`}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="autoplay; fullscreen"
+                              allowFullScreen
+                              title={stabilizationVideos[currentStabilizationVideo].title}
+                            ></iframe>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-neutral-800">
+                              <p className="text-gray-400">Видео будет добавлено</p>
+                            </div>
+                          )}
+                      </div>
+                      
+                      {/* Навигация */}
+                      <div className="flex items-center justify-between mt-4">
+                          <motion.button 
+                              onClick={() => setCurrentStabilizationVideo(prev => prev === 0 ? stabilizationVideos.length - 1 : prev - 1)}
+                              className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
+                          >
+                              <ChevronLeft size={20} />
+                          </motion.button>
+                          
+                          <div className="flex gap-2">
+                              {stabilizationVideos.map((_, idx) => (
+                                  <motion.button 
+                                      key={idx}
+                                      onClick={() => setCurrentStabilizationVideo(idx)}
+                                      className={`w-2 h-2 rounded-full transition-colors ${idx === currentStabilizationVideo ? 'bg-white' : 'bg-neutral-600 hover:bg-neutral-500'}`}
+                                      whileHover={{ scale: 1.3 }}
+                                  />
+                              ))}
                           </div>
-                        </>
-                      )}
-                  </div>
+                          
+                          <motion.button 
+                              onClick={() => setCurrentStabilizationVideo(prev => prev === stabilizationVideos.length - 1 ? 0 : prev + 1)}
+                              className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
+                          >
+                              <ChevronRight size={20} />
+                          </motion.button>
+                      </div>
+                      
+                      <p className="text-center text-sm text-gray-500 mt-2">{stabilizationVideos[currentStabilizationVideo].title}</p>
+                  </motion.div>
                 </ScrollReveal>
             </div>
 
             {/* Tech 2: Solovey */}
             <ScrollReveal variants={scaleIn}>
-              <div className="rounded-3xl bg-[#0a0a0a] border border-neutral-800 p-8 md:p-12">
-                   <div className="flex flex-col lg:flex-row gap-12">
+              <div className="rounded-3xl bg-[#0a0a0a] border border-neutral-800 p-8 md:p-12 relative overflow-hidden">
+                   {/* Фоновое изображение */}
+                   <div className="absolute top-0 right-[45%] inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                       <img 
+                           src="/cameraKG1.png" 
+                           alt="Background" 
+                           className="w-full h-full object-contain opacity-15"
+                       />
+                   </div>
+                   
+                   <div className="flex flex-col lg:flex-row gap-12 relative z-10">
                       <motion.div 
                         className="lg:w-1/2"
                         initial={{ opacity: 0, x: -30 }}
@@ -1612,8 +2145,24 @@ ${projectDescription}
             </ScrollReveal>
 
             <ScrollReveal>
-              <div className="mt-16 bg-gradient-to-r from-neutral-900 to-neutral-800 p-8 lg:p-12 rounded-3xl border border-neutral-700">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="mt-16 bg-gradient-to-r from-neutral-900 to-neutral-800 p-8 lg:p-12 rounded-3xl border border-neutral-700 relative overflow-hidden">
+                  {/* Фоновые изображения с автоматическим переключением */}
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                      {platesBackgroundImages.map((image, idx) => (
+                          <img 
+                              key={idx}
+                              src={image} 
+                              alt={`Background ${idx + 1}`} 
+                              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 will-change-opacity"
+                              style={{ 
+                                  opacity: idx === currentPlatesBackground ? 0.15 : 0,
+                                  transform: 'translateZ(0)' // Hardware acceleration
+                              }}
+                          />
+                      ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
                       {/* Текстовый блок */}
                       <motion.div
                         initial={{ opacity: 0, x: -30 }}
@@ -1622,7 +2171,7 @@ ${projectDescription}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
                           <div className="inline-block bg-neutral-800 text-gray-400 px-3 py-1 rounded text-xs uppercase mb-4">VR Production</div>
-                          <h3 className="text-3xl lg:text-4xl font-bold mb-6">Plates для <span className="text-gray-300">виртуального продакшена</span></h3>
+                          <h3 className="text-3xl lg:text-4xl font-bold mb-6">Plates для <span className="text-gray-300">виртуального продакшна</span></h3>
                           <p className="text-gray-400 mb-6 text-lg">
                               Библиотека готовых панорамных видеофонов для LED-экранов и хромакей-студий.
                           </p>
@@ -1809,9 +2358,13 @@ ${projectDescription}
 
       {/* --- Contact & Footer --- */}
       <footer id="contact" className="bg-[#0a0a0a] pt-24 pb-12 px-4 border-t border-neutral-800">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="max-w-7xl mx-auto">
+          <ScrollReveal variants={fadeInLeft}>
+            <h2 className="text-5xl font-bold text-white mb-12">Готовы обсудить <br/>ваш <span className="text-gray-400">проект</span>.</h2>
+          </ScrollReveal>
+          
+          <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-16">
             <ScrollReveal variants={fadeInLeft}>
-                <h2 className="text-5xl font-bold text-white mb-8">Готовы обсудить <br/>ваш <span className="text-gray-400">проект</span>.</h2>
                 <div className="space-y-6 text-lg text-gray-300">
                     <motion.div 
                       className="flex items-center gap-4"
@@ -1960,6 +2513,7 @@ ${projectDescription}
                 </div>
               </form>
             </ScrollReveal>
+          </div>
         </div>
         
         <motion.div 

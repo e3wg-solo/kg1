@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка переменных окружения</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        .container {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .env-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: #0f0f0f;
+            border-radius: 8px;
+            border-left: 4px solid #666;
+        }
+        .env-item.ok {
+            border-left-color: #10b981;
+        }
+        .env-item.error {
+            border-left-color: #ef4444;
+        }
+        .label {
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .value {
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            word-break: break-all;
+        }
+        .value.masked {
+            color: #10b981;
+        }
+        .value.missing {
+            color: #ef4444;
+        }
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .status.success {
+            background: #10b98120;
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .status.error {
+            background: #ef444420;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        code {
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Проверка переменных окружения</h1>
+        
+        <div id="env-check"></div>
+        
+        <div id="status" class="status"></div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #0f0f0f; border-radius: 8px; font-size: 14px; color: #888;">
+            <strong>Как использовать:</strong><br>
+            1. Откройте этот файл в браузере на вашем деплое Vercel<br>
+            2. Проверьте, что все переменные загружены<br>
+            3. Если переменные отсутствуют, добавьте их в Vercel Settings → Environment Variables
+        </div>
+    </div>
+
+    <script type="module">
+        const envCheck = document.getElementById('env-check');
+        const statusDiv = document.getElementById('status');
+        
+        const requiredVars = {
+            'VITE_TELEGRAM_BOT_TOKEN': 'Токен Telegram бота',
+            'VITE_TELEGRAM_CHAT_ID': 'ID чата Telegram'
+        };
+        
+        let allOk = true;
+        let html = '';
+        
+        for (const [varName, description] of Object.entries(requiredVars)) {
+            const value = import.meta.env[varName];
+            const exists = value !== undefined && value !== '';
+            const isOk = exists;
+            
+            if (!isOk) allOk = false;
+            
+            html += `
+                <div class="env-item ${isOk ? 'ok' : 'error'}">
+                    <span class="label">${description}</span>
+                    <span class="label"><code>${varName}</code></span>
+                    <div class="value ${isOk ? 'masked' : 'missing'}">
+                        ${isOk 
+                            ? (varName.includes('TOKEN') 
+                                ? value.substring(0, 10) + '...' + value.substring(value.length - 5)
+                                : value)
+                            : '❌ НЕ НАЙДЕНО'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        envCheck.innerHTML = html;
+        
+        if (allOk) {
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = '✅ Все переменные окружения загружены правильно!';
+        } else {
+            statusDiv.className = 'status error';
+            statusDiv.innerHTML = '❌ Некоторые переменные окружения отсутствуют!<br>Добавьте их в Vercel Settings → Environment Variables';
+        }
+        
+        // Дополнительная информация
+        console.log('=== Проверка переменных окружения ===');
+        for (const [varName] of Object.entries(requiredVars)) {
+            const value = import.meta.env[varName];
+            console.log(`${varName}:`, value ? '✅ Загружено' : '❌ Отсутствует');
+        }
+    </script>
+</body>
+</html>
