@@ -125,14 +125,14 @@ const SecondaryButton = ({ text, onClick, href, className = "" }) => (
 const FilmStripCarousel = ({ images = [], isMobile = false }) => {
   // Default placeholder images if none provided
   const defaultImages = [
-    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1574267432644-f610f5293744?w=400&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop',
+    'https://downloader.disk.yandex.ru/preview/418bec8c5918e6b81ecf123daa1d9609f547452052770d8af601104cedd28bad/698a9bd2/2EcLAQfVNy-TA7RU4RSV_MGWEka8ZQASgaXO-_X5wrwTs-PNKfyQSuSB8j6VZ9I4eXPlXD-2ZeKzviqAuHkIcQ%3D%3D?uid=0&filename=9V6A9642.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/770c02fff7f99eba11ce87f35206e771295ac9f96df050ffe544d4ae500c3c35/698a9b16/aaINBUV-kd2dVUlQpBGwCZtnHChkBx3zRRDNFqVIXoEQiGhoIR4rkjcU61jANaZnKhX0uYDEE9uCh52K3kPN5A%3D%3D?uid=0&filename=9V6A0537.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/1a89c4bc14f2354e0fd0caa9c45dc974283d4257ff94eb1214f22ba35f7bdd17/698a9c47/6FKjjMxSG8vcrqN7sD_xLqIL-GNir5sqyao9xCcTIXD4HQQ3PhWSsutTZriwPi7RQwznFe2-ain4usNXLpE6oQ%3D%3D?uid=0&filename=IMG_9112.JPG&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/77e2f899150ee8caa5c260708280d047a7536a97be60dfcf028df684e8b466f6/698a9c1f/7ISLX858bWujTq6s9uQoRg9Fxi7OSvdfMvETY7OJmhJ7MiWUND2eNMhc44oQxcBeZKLlxBItWvl5FQ6fcYFuhA%3D%3D?uid=0&filename=DSC_2836.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/2295c590478d613a161078fee5e6977d9b4a4c93f78bf1f44969c381fb02f019/698a9cb4/gS_cZUVg_xLPI1vNw7bXP8SPSDOdL8ggdVS1C6E-iVszR3rWyj1uy9y3jWhzKKE5VBHVYmBesnjJXRAcI_gL7w%3D%3D?uid=0&filename=IMG_5589.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/8fbb751915795c0c6d99f35895a39e97a3ff860f261254d2a8750fdf60cd53d0/698a9a85/7PUzrvGciCPgqvZh2yX0rw8qcoyifTpa7SDNrWncsQdJxc5H9ll5pviRo-afZb6B1lNV1MJQvGHu_-yflK3Saw%3D%3D?uid=0&filename=079A4598.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/70d5f2c9e5b257579e07a7586dea84c9d70285613985ee4d5900c6648d2f4222/698a9cf4/SU0Xv5ZNvwJQT4gx-y19CJBGTm4QhrvFUGrVL1ebhWiSn7zS6EI5AyV5s5DzoRZGko4N9dzju8vSQVPq71h6Jg%3D%3D?uid=0&filename=IMG_2310.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
+    'https://downloader.disk.yandex.ru/preview/6118681d96bb0b502779dcc56ecba160397cbba252a39bf03070bac1a9d372d3/698a9d37/07vDvRdiGK_Umqb7K0OKYTFaSnE_hnuCk0ERrpkgAHOqX_2IxJa3b9QbvnYqsUOi_axdbqNFtOuGjHOFdDLDag%3D%3D?uid=0&filename=IMG_3772.jpg&disposition=inline&hash=&limit=0&content_type=image%2Fjpeg&owner_uid=0&tknv=v3&size=2880x1576',
   ];
 
   const filmImages = images.length > 0 ? images : defaultImages;
@@ -2077,11 +2077,11 @@ ${projectDescription}
             <ScrollReveal variants={scaleIn}>
               <div className="rounded-3xl bg-[#0a0a0a] border border-neutral-800 p-8 md:p-12 relative overflow-hidden">
                    {/* Фоновое изображение */}
-                   <div className="absolute top-0 right-[45%] inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                   <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl flex items-center justify-center md:justify-end md:right-[45%]">
                        <img 
                            src="/cameraKG1.png" 
                            alt="Background" 
-                           className="w-full h-full object-contain opacity-15"
+                           className="w-[120%] md:w-full h-auto md:h-full object-contain opacity-15"
                        />
                    </div>
                    
